@@ -1,9 +1,9 @@
 
 import encoder_decoders.ExtensionManager;
-import encoder_decoders.IEncoderDecoder;
+import encoder_decoders.Image;
 
 
-import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
@@ -12,13 +12,18 @@ public class Main {
 
         Scanner in = new Scanner(System.in);
         System.out.print("Input a full path: ");
-        String filename = in.nextLine();
+        String filepath = in.nextLine();
 
-        ExtensionManager manager = new ExtensionManager();
-        String[] split = filename.split("\\.");
-        IEncoderDecoder extension = manager.getExtension(split[split.length - 1]);
+        String[] split = filepath.split("\\.");
+        ExtensionManager manager = new ExtensionManager(filepath);
 
-        extension.decodeMessage(new File(filename));
+        Image image = manager.getExtension(split[split.length - 1]);
+
+        try {
+            image.decode();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 }

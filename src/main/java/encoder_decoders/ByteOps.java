@@ -1,5 +1,8 @@
 package encoder_decoders;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 public class ByteOps {
@@ -13,5 +16,14 @@ public class ByteOps {
             hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
         }
         return new String(hexChars, StandardCharsets.UTF_8);
+    }
+
+    public static void doCopy(InputStream is, OutputStream os) throws IOException {
+        int oneByte;
+        while ((oneByte = is.read()) != -1) {
+            os.write(oneByte);
+        }
+        os.close();
+        is.close();
     }
 }

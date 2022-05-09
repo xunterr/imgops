@@ -1,38 +1,56 @@
 package encoder_decoders.png;
 
 import encoder_decoders.ByteOps;
+import encoder_decoders.Image;
 import filemanager.FileReader;
 
-import java.io.File;
+import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.zip.InflaterInputStream;
 
-public class PngImage {
+public class PngImage implements Image {
 
-    List<Byte> byteArray = new ArrayList<>();
+    private final File file;
 
-    protected void encode(Object message, File file) {
-
+    public PngImage(String filename) {
+        this.file = new File(filename);
     }
 
-    protected void decode(File file) {
-        byteArray = FileReader.readToByteArray(file, 0, 8);
-        if(isTrueFile(byteArray)){
-            System.out.println("ITS A PNG!");
-        }else{System.out.println("ITS ISNT A PNG!");}
+    @Override
+    public List<String> getName() {
+        return List.of("png");
     }
 
-    protected boolean isTrueFile(List<Byte> byteArray) {
-        boolean result = false;
-        byte[] trueInfo = new byte[8];
-        for(int i = 0; i<8; i++){
-            trueInfo[i] = byteArray.get(i);
+    @Override
+    public OutputStream decode() throws IOException {
+
+        FileInputStream fis = new FileInputStream(file);
+
+        if(!isTrueFile(fis.readAllBytes())){
+            throw new RuntimeException("This is not a png file");
         }
-        String magicNumber = ByteOps.bytesToHex(trueInfo);
-        System.out.println(magicNumber);
-        if(magicNumber.equalsIgnoreCase("89504e470d0a1a0a"))
-            result = true;
 
-        return result;
+        InflaterInputStream iis = new InflaterInputStream(fis);
+        OutputStream os = new ByteArrayOutputStream();
+
+        ByteOps.doCopy(iis, os);
+        return os;
+    }
+
+    @Override
+    public OutputStream encode(InputStream is) {
+        return null;
+    }
+
+    protected boolean isTrueFile(byte[] bytes) {
+        String pngRecognitionHex = ByteOps.bytesToHex(Arrays.copyOfRange(bytes, 0,8));
+        if(pngRecognitionHex.equals("89504E470D0A1A0A")){
+            System.out.println("PNG!");
+            return true;
+        }
+        return false;
     }
 }
