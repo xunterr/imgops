@@ -1,7 +1,7 @@
+package com.xunterr.imgops;
 
-import encoder_decoders.ExtensionManager;
-import encoder_decoders.Image;
-
+import com.xunterr.imgops.encoder_decoders.ExtensionManager;
+import com.xunterr.imgops.encoder_decoders.Image;
 
 import java.io.IOException;
 import java.util.Scanner;

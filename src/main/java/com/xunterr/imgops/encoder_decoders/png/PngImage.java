@@ -1,9 +1,9 @@
-package encoder_decoders.png;
+package com.xunterr.imgops.encoder_decoders.png;
 
 import com.google.common.primitives.Ints;
-import encoder_decoders.Image;
+import com.xunterr.imgops.encoder_decoders.Image;
+import com.xunterr.imgops.utils.ByteOps;
 import lombok.Getter;
-import utils.ByteOps;
 
 import java.io.File;
 import java.io.IOException;
