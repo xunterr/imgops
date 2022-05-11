@@ -1,9 +1,7 @@
-package encoder_decoders;
+package com.xunterr.imgops.encoder_decoders;
 
-import encoder_decoders.png.PngImage;
+import com.xunterr.imgops.encoder_decoders.png.PngImage;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 

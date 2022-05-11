@@ -1,4 +1,4 @@
-package encoder_decoders.png;
+package com.xunterr.imgops.encoder_decoders.png;
 
 import lombok.Getter;
 

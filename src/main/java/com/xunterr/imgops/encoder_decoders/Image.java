@@ -1,4 +1,4 @@
-package encoder_decoders;
+package com.xunterr.imgops.encoder_decoders;
 
 import java.io.IOException;
 import java.io.InputStream;
