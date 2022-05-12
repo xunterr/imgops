@@ -5,13 +5,12 @@ import com.xunterr.imgops.image.Image;
 import com.xunterr.imgops.utils.ByteOps;
 import lombok.Getter;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.zip.InflaterOutputStream;
 
 @Getter
 public class PngImage implements Image {
@@ -20,7 +19,9 @@ public class PngImage implements Image {
     private int width;
     private int height;
     private int compressionMethod;
+    private byte[] compressedData;
     private byte[] data;
+
 
     public PngImage(String filename) {
         this.file = new File(filename);
@@ -41,20 +42,21 @@ public class PngImage implements Image {
 
         int IDATNumber = 0;
         int position = 8;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         while(position < bytes.length){
             PngChunk chunk = new PngChunk(Arrays.copyOfRange(bytes, position, bytes.length));
             System.out.println("Current chunk: " + chunk.getType());
-            switch (chunk.getType()){
-                case "IHDR":
-                    parseIHDRChunk(chunk);
-                    break;
-                case "tEXt":
-                    parseTEXTChunk(chunk);
-                case "IDAT":
-                    //addIDATChunk(chunk);
+            switch (chunk.getType()) {
+                case "IHDR" -> parseIHDRChunk(chunk);
+                case "tEXt" -> parseTEXTChunk(chunk);
+                case "IDAT" -> {
+                    baos.writeBytes(addIDATChunk(chunk).toByteArray());
                     IDATNumber++;
-                case "IEND":
-                    parseIENDChunk(chunk);
+                }
+                case "IEND" -> {
+                    parseIENDChunk(baos);
+                    System.out.println(data.length);
+                }
             }
             position += chunk.getTotalLength();
         }
@@ -66,17 +68,20 @@ public class PngImage implements Image {
         System.out.println("\tText: " + new String(chunk.getData(), StandardCharsets.UTF_8));
     }
 
-    private void parseIENDChunk(PngChunk chunk) {
-//        ByteArrayOutputStream os = new ByteArrayOutputStream();
-//        try (OutputStream ios = new InflaterOutputStream(os)) {
-//            ios.write(chunk.getData());
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        this.data = os.toByteArray();
+    private void parseIENDChunk(ByteArrayOutputStream baos) {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try (OutputStream ios = new InflaterOutputStream(os)) {
+            ios.write(baos.toByteArray());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        this.data = os.toByteArray();
     }
 
-    private void addIDATChunk(PngChunk chunk) {
+    private ByteArrayOutputStream addIDATChunk(PngChunk chunk) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.writeBytes(chunk.getData());
+        return baos;
     }
 
     private void parseIHDRChunk(PngChunk chunk) {
