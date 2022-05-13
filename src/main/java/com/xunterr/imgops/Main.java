@@ -14,15 +14,14 @@ public class Main {
         String filepath = in.nextLine();
 
         String[] split = filepath.split("\\.");
-        ExtensionManager manager = new ExtensionManager(filepath);
+        ImageFactory manager = new ImageFactory(filepath);
 
         Image image = manager.getExtension(split[split.length - 1]);
 
         try {
             image.decode();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("An error occurred: ");
         }
-
     }
 }

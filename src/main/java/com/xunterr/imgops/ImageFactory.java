@@ -6,10 +6,10 @@ import com.xunterr.imgops.image.png.PngImage;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExtensionManager {
+public class ImageFactory {
     List<Image> images = new ArrayList<>();
 
-    public ExtensionManager(String filepath){
+    public ImageFactory(String filepath){
         addExtension(new PngImage(filepath));
     }
 

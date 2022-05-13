@@ -19,9 +19,7 @@ public class PngImage implements Image {
     private int width;
     private int height;
     private int compressionMethod;
-    private byte[] compressedData;
     private byte[] data;
-
 
     public PngImage(String filename) {
         this.file = new File(filename);
@@ -33,8 +31,13 @@ public class PngImage implements Image {
     }
 
     @Override
-    public byte[] decode() throws IOException {
-        byte[] bytes = Files.readAllBytes(file.toPath());
+    public byte[] decode() {
+        byte[] bytes = new byte[0];
+        try {
+            bytes = Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            throw new RuntimeException("File '" + file.getPath() + "' not found");
+        }
 
         if(!isTrueFile(bytes)){
             throw new RuntimeException("This is not a png file");
