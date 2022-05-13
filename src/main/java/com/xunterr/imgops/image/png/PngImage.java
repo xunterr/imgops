@@ -44,17 +44,16 @@ public class PngImage implements Image {
             throw new FileNotFoundException("File '" + file.getPath() + "' not found");
         }
 
-        if(!isTrueFile(bytes)){
-            throw new InvalidImageException("This is not a png file");
-        }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        if(!isTrueFile(bytes)){throw new InvalidImageException("This is not a png file");}
 
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         parseChunks(bytes);
         for (PngChunk chunk : chunks) {
             switch (chunk.getType()) {
-                case "IHDR" -> parseIHDRChunk(chunk);
-                case "IDAT" -> baos.writeBytes(addIDATChunk(chunk).toByteArray());
-                case "IEND" -> parseIENDChunk(baos);
+                case IHDR -> parseIHDRChunk(chunk);
+                case TEXT -> parseTEXTChunk(chunk);
+                case IDAT -> baos.writeBytes(addIDATChunk(chunk).toByteArray());
+                case IEND -> parseIENDChunk(baos);
             }
         }
 
