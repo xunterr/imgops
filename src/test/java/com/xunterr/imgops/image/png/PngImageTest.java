@@ -3,6 +3,7 @@ package com.xunterr.imgops.image.png;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.HexFormat;
 import java.util.List;
 
@@ -26,14 +27,14 @@ class PngImageTest {
     }
 
     @Test
-    void decode_NOT_NULL(){
+    void decode_NOT_NULL() throws IOException {
         assertNotNull(pngImage.decode());
     }
 
     @Test
     void decode_THROWS_NOTFOUND(){
         PngImage pngInvalidImage = new PngImage("abcd.png");
-        assertThrows(RuntimeException.class, pngInvalidImage::decode);
+        assertThrows(IOException.class, pngInvalidImage::decode);
     }
 
     @Test

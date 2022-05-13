@@ -21,7 +21,7 @@ public class Main {
         try {
             image.decode();
         } catch (IOException e) {
-            System.out.println("An error occurred: ");
+            throw new RuntimeException(e);
         }
     }
 }

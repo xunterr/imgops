@@ -1,6 +1,7 @@
 package com.xunterr.imgops.image.png;
 
 import com.google.common.primitives.Ints;
+import com.xunterr.imgops.exception.InvalidImageException;
 import com.xunterr.imgops.image.Image;
 import com.xunterr.imgops.utils.ByteOps;
 import lombok.Getter;
@@ -9,7 +10,9 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.InflaterOutputStream;
 
 @Getter
@@ -20,6 +23,7 @@ public class PngImage implements Image {
     private int height;
     private int compressionMethod;
     private byte[] data;
+    private Set<PngChunk> chunks;
 
     public PngImage(String filename) {
         this.file = new File(filename);
@@ -31,53 +35,50 @@ public class PngImage implements Image {
     }
 
     @Override
-    public byte[] decode() {
-        byte[] bytes = new byte[0];
+    public byte[] decode() throws IOException {
+        byte[] bytes;
+
         try {
             bytes = Files.readAllBytes(file.toPath());
         } catch (IOException e) {
-            throw new RuntimeException("File '" + file.getPath() + "' not found");
+            throw new FileNotFoundException("File '" + file.getPath() + "' not found");
         }
 
         if(!isTrueFile(bytes)){
-            throw new RuntimeException("This is not a png file");
+            throw new InvalidImageException("This is not a png file");
         }
-
-        int IDATNumber = 0;
-        int position = 8;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        while(position < bytes.length){
-            PngChunk chunk = new PngChunk(Arrays.copyOfRange(bytes, position, bytes.length));
-            System.out.println("Current chunk: " + chunk.getType());
+
+        parseChunks(bytes);
+        for (PngChunk chunk : chunks) {
             switch (chunk.getType()) {
                 case "IHDR" -> parseIHDRChunk(chunk);
-                case "tEXt" -> parseTEXTChunk(chunk);
-                case "IDAT" -> {
-                    baos.writeBytes(addIDATChunk(chunk).toByteArray());
-                    IDATNumber++;
-                }
-                case "IEND" -> {
-                    parseIENDChunk(baos);
-                    System.out.println(data.length);
-                }
+                case "IDAT" -> baos.writeBytes(addIDATChunk(chunk).toByteArray());
+                case "IEND" -> parseIENDChunk(baos);
             }
+        }
+
+        return data;
+    }
+
+    private void parseChunks(byte[] data) {
+        int position = 8;
+        this.chunks = new HashSet<>();
+        while(position < data.length){
+            PngChunk chunk = new PngChunk(Arrays.copyOfRange(data, position, data.length));
+            chunks.add(chunk);
             position += chunk.getTotalLength();
         }
-        System.out.println("\tNumber of IDAT chunks: " + IDATNumber);
-        return new byte[10];
     }
 
     private void parseTEXTChunk(PngChunk chunk) {
         System.out.println("\tText: " + new String(chunk.getData(), StandardCharsets.UTF_8));
     }
 
-    private void parseIENDChunk(ByteArrayOutputStream baos) {
+    private void parseIENDChunk(ByteArrayOutputStream baos) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        try (OutputStream ios = new InflaterOutputStream(os)) {
-            ios.write(baos.toByteArray());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        OutputStream ios = new InflaterOutputStream(os);
+        ios.write(baos.toByteArray());
         this.data = os.toByteArray();
     }
 
