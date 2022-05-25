@@ -22,6 +22,7 @@ public class PngImage implements Image {
     private int width;
     private int height;
     private int compressionMethod;
+    private String textData;
     private byte[] data;
     private Set<PngChunk> chunks;
 
@@ -30,8 +31,13 @@ public class PngImage implements Image {
     }
 
     @Override
-    public List<String> getName() {
+    public List<String> getExtensions() {
         return List.of("png");
+    }
+
+    @Override
+    public String getName(){
+        return file.getName().split("\\.")[0];
     }
 
     @Override
@@ -71,7 +77,7 @@ public class PngImage implements Image {
     }
 
     private void parseTEXTChunk(PngChunk chunk) {
-        System.out.println("\tText: " + new String(chunk.getData(), StandardCharsets.UTF_8));
+        this.textData = new String(chunk.getData(), StandardCharsets.UTF_8);
     }
 
     private void parseIENDChunk(ByteArrayOutputStream baos) throws IOException {
@@ -100,10 +106,6 @@ public class PngImage implements Image {
 
     protected boolean isTrueFile(byte[] bytes) {
         String pngRecognitionHex = ByteOps.bytesToHex(Arrays.copyOfRange(bytes, 0,8));
-        if(pngRecognitionHex.equals("89504E470D0A1A0A")){
-            System.out.println("PNG hex found");
-            return true;
-        }
-        return false;
+        return pngRecognitionHex.equals("89504E470D0A1A0A");
     }
 }

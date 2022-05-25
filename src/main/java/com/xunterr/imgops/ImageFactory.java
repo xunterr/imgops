@@ -9,25 +9,13 @@ import java.util.List;
 public class ImageFactory {
     List<Image> images = new ArrayList<>();
 
-    public ImageFactory(String filepath){
-        addExtension(new PngImage(filepath));
-    }
-
-    private void addExtension(Image img){
-        boolean nameFound = images.stream().anyMatch((it) -> it.getName().equals(img.getName()));
-        if(!nameFound){
-            images.add(img);
-        }
-    }
-
-    public Image getExtension(String search){
-        String searchLower = search.toLowerCase();
-        for (Image image : images) {
-            if(image.getName().contains(searchLower)){
-                return image;
-            }
-        }
-        return null;
+    public static Image getImage(String filepath){
+        String[] search = filepath.split("\\.");
+        String searchLower = search[search.length - 1].toLowerCase();
+        return switch (searchLower) {
+            case "png" -> new PngImage(filepath);
+            default -> null;
+        };
     }
 
 

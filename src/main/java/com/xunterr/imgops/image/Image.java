@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface Image {
 
-    List<String> getName();
+    List<String> getExtensions();
+
+    String getName();
 
     byte[] decode() throws IOException;
 
