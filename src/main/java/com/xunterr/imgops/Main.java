@@ -13,16 +13,15 @@ public class Main {
         System.out.print("Input a full path: ");
         String filepath = in.nextLine();
 
-        String[] split = filepath.split("\\.");
-        ExtensionManager manager = new ExtensionManager(filepath);
-
-        Image image = manager.getExtension(split[split.length - 1]);
-
+        Image image = ImageFactory.getImage(filepath);
+        byte[] data;
         try {
-            image.decode();
+            data = image.decode();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        System.out.println("Decoded data length: " + data.length);
 
     }
 }

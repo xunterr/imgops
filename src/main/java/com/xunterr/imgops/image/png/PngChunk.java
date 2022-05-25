@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class PngChunk {
     private final int totalLength;
     private int dataLength;
-    private String type;
+    private PngChunkType type;
     private byte[] data;
     private byte[] crc;
 
@@ -30,7 +30,7 @@ public class PngChunk {
 
     private void setType(byte[] bytes) {
         byte[] typeBytes = Arrays.copyOfRange(bytes, 4, 8);
-        this.type = new String(typeBytes, StandardCharsets.UTF_8);
+        this.type = PngChunkType.valueOf(new String(typeBytes, StandardCharsets.UTF_8).toUpperCase());
     }
 
     private void setData(byte[] bytes) {
