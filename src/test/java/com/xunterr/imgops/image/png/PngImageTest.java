@@ -22,8 +22,15 @@ class PngImageTest {
 
     @Test
     void getName() {
-        List<String> name = pngImage.getName();
-        assertEquals("png", name.get(0));
+        String name = pngImage.getName();
+        assertEquals("test", name);
+    }
+
+    @Test
+    void getExtension(){
+        List<String> extension = pngImage.getExtensions();
+        assertEquals("png", extension.get(0));
+
     }
 
     @Test
